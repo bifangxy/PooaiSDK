@@ -128,14 +128,13 @@ public class MainActivity extends AppCompatActivity {
         mPooaiDetectionManager.startUrineTest(new PooaiDetectionManager.OnDetectionListener<PooaiUrineData>() {
             @Override
             public void start() {
-                Log.d(TAG, "---开始尿检---");
             }
 
             @Override
             public void complete(PooaiUrineData data) {
+                Log.d(TAG, "尿检完成" + " data = " + data.sourceData);
+
                 isUrine = false;
-                Log.d(TAG, "---检测完成---");
-                Log.d(TAG, "---data---" + data.sourceData);
             }
 
             @Override
@@ -162,19 +161,16 @@ public class MainActivity extends AppCompatActivity {
         mPooaiDetectionManager.startPregnancyTest(new PooaiDetectionManager.OnDetectionListener<PooaiPregnancyData>() {
             @Override
             public void start() {
-                Log.d(TAG, "---开始孕检---");
             }
 
             @Override
             public void complete(PooaiPregnancyData data) {
+                Log.d(TAG, "孕检完成" + " data = " + data.sourceData);
                 isPregnancy = false;
-                Log.d(TAG, "---检测完成---");
-                Log.d(TAG, "---data---" + data.pregnancyResult);
             }
 
             @Override
             public void cancel() {
-                Log.d(TAG, "---取消孕检---");
                 isPregnancy = false;
             }
 
@@ -197,14 +193,12 @@ public class MainActivity extends AppCompatActivity {
         mPooaiDetectionManager.startOvulationTest(new PooaiDetectionManager.OnDetectionListener<PooaiOvulationData>() {
             @Override
             public void start() {
-                Log.d(TAG, "---开始排卵---");
             }
 
             @Override
             public void complete(PooaiOvulationData data) {
                 isOvulation = false;
-                Log.d(TAG, "---检测完成---");
-                Log.d(TAG, "---data---" + data.ovulationResult);
+                Log.d(TAG, "排卵检测完成" + " data = " + data.sourceData);
             }
 
             @Override
@@ -229,7 +223,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void heartRate(int heartRate, int errorType) {
-                Log.d(TAG, "heartData =" + heartRate + "  errorType = " + errorType);
             }
 
             @Override

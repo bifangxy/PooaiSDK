@@ -26,7 +26,7 @@ import io.reactivex.functions.Predicate;
 
 /**
  * 作者：created by xieying on 2020-01-26 12:02
- * 功能：
+ * 功能：检测功能管理类
  */
 public class PooaiDetectionManager {
     private static final String TAG = PooaiDetectionManager.class.getSimpleName();
@@ -67,15 +67,12 @@ public class PooaiDetectionManager {
         mUrineDispose = isToiletConnect()
                 .flatMap((Function<Boolean, ObservableSource<Long>>) aBoolean -> {
                     if (aBoolean) {
-                        Log.d(TAG, "--开始倒计时--");
                         return Observable.timer(URINE_WAITING_TIME, TimeUnit.MILLISECONDS);
                     } else {
-                        Log.d(TAG, "--设备未连接--");
                         return observer -> observer.onError(new Exception("device not connected"));
                     }
                 })
                 .map(aLong -> {
-                    Log.d(TAG, "--发送开始检测命令--");
                     sendStartUrineCommand();
                     onDetectionListener.start();
                     return true;
@@ -83,7 +80,6 @@ public class PooaiDetectionManager {
                 .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> getUrineFinishObservable())
                 .filter(aBoolean -> aBoolean)
                 .doOnComplete(() -> {
-                    Log.d(TAG, "--检测完成--");
                     PooaiUrineData pooaiUrineData = getUrineTestResult();
                     onDetectionListener.complete(pooaiUrineData);
                 })
@@ -133,7 +129,6 @@ public class PooaiDetectionManager {
     }
 
     private boolean isUrineTestFinish() {
-        Log.d(TAG, "value = " + ToiletRegisterData.getInstance().getRegisterValue(ToiletConfig.REGISTER_URINE_TEST1));
         return ToiletRegisterData.getInstance().getRegisterValue(ToiletConfig.REGISTER_URINE_TEST1) >= 38;
     }
 
@@ -146,26 +141,21 @@ public class PooaiDetectionManager {
         mPregnancyDispose = isToiletConnect()
                 .flatMap((Function<Boolean, ObservableSource<Long>>) aBoolean -> {
                     if (aBoolean) {
-                        Log.d(TAG, "--开始倒计时--");
                         return Observable.timer(URINE_WAITING_TIME, TimeUnit.MILLISECONDS);
                     } else {
-                        Log.d(TAG, "--设备未连接--");
                         return observer -> observer.onError(new Exception("device not connected"));
                     }
                 })
                 .map(aLong -> {
-                    Log.d(TAG, "--发送开始检测命令--");
                     sendStartPregnancyCommand();
                     onDetectionListener.start();
                     return true;
                 })
                 .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> {
-                    Log.d(TAG, "--正在检测--");
                     return getPregnancyFirstStepObservable();
                 })
                 .filter(aBoolean -> aBoolean)
                 .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> {
-                    Log.d(TAG, "--第一步检测完成--");
                     getToiletDetectionResult();
                     sendSecondPregnancyCommand();
                     return getPregnancySecondStepObservable();
@@ -173,14 +163,11 @@ public class PooaiDetectionManager {
                 .filter(aBoolean -> aBoolean)
                 .doOnNext(aBoolean -> {
                     getToiletDetectionResult();
-                    Log.d(TAG, "--第二步检测完成，获取值--");
                 })
                 .doOnComplete(() -> {
                     PooaiPregnancyData pooaiPregnancyData = new PooaiPregnancyData();
-                    pooaiPregnancyData.pregnancyResult = conversionDetectionResult(mDataList);
                     pooaiPregnancyData.sourceData = mDataList.toString();
                     onDetectionListener.complete(pooaiPregnancyData);
-                    Log.d(TAG, "--检测完成--");
                 })
                 .doOnDispose(onDetectionListener::cancel)
                 .doOnError(onDetectionListener::error)
@@ -239,26 +226,19 @@ public class PooaiDetectionManager {
         mOvulationDispose = isToiletConnect()
                 .flatMap((Function<Boolean, ObservableSource<Long>>) aBoolean -> {
                     if (aBoolean) {
-                        Log.d(TAG, "--开始倒计时--");
                         return Observable.timer(URINE_WAITING_TIME, TimeUnit.MILLISECONDS);
                     } else {
-                        Log.d(TAG, "--设备未连接--");
                         return observer -> observer.onError(new Exception("device not connected"));
                     }
                 })
                 .map(aLong -> {
-                    Log.d(TAG, "--发送开始检测命令--");
                     onDetectionListener.start();
                     sendStartOvulationCommand();
                     return true;
                 })
-                .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> {
-                    Log.d(TAG, "--正在检测--");
-                    return getOvulationFirstStepObservable();
-                })
+                .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> getOvulationFirstStepObservable())
                 .filter(aBoolean -> aBoolean)
                 .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> {
-                    Log.d(TAG, "--第一步检测完成开始第二步检测--");
                     getToiletDetectionResult();
                     sendSecondOvulationCommand();
                     return getOvulationSecondStepObservable();
@@ -266,14 +246,11 @@ public class PooaiDetectionManager {
                 .filter(aBoolean -> aBoolean)
                 .doOnNext(aBoolean -> {
                     getToiletDetectionResult();
-                    Log.d(TAG, "--第二步检测完成，获取值--");
                 })
                 .doOnComplete(() -> {
                     PooaiOvulationData pooaiOvulationData = new PooaiOvulationData();
-                    pooaiOvulationData.ovulationResult = conversionDetectionResult(mDataList);
                     pooaiOvulationData.sourceData = mDataList.toString();
                     onDetectionListener.complete(pooaiOvulationData);
-                    Log.d(TAG, "--检测完成--");
                 })
                 .doOnDispose(onDetectionListener::cancel)
                 .doOnError(onDetectionListener::error)
@@ -424,58 +401,6 @@ public class PooaiDetectionManager {
         }
     }
 
-    /**
-     * @param dataList 检测数值
-     * @return 检测结果 0，为一条杠 1，两条杠 2，无效
-     * 判断依据：取16个点的值，颜色越浅值越大 2～7为第一杠检测区域
-     * 7～10 为中间区域，认为是白色的区域
-     * 10～15为第二杠检测点的区域
-     */
-    private int conversionDetectionResult(List<Long> dataList) {
-        if (dataList.size() != 16) {
-            return 2;
-        }
-        long min1 = dataList.get(2);
-        for (int i = 2; i < 7; i++) {
-            if (min1 > dataList.get(i)) {
-                min1 = dataList.get(i);
-            }
-        }
-
-        long min2 = dataList.get(10);
-        for (int i = 10; i < 15; i++) {
-            if (min2 > dataList.get(i)) {
-                min2 = dataList.get(i);
-            }
-        }
-
-        long max3 = dataList.get(7);
-        for (int i = 7; i < 10; i++) {
-            if (max3 < dataList.get(i)) {
-                max3 = dataList.get(i);
-            }
-        }
-        int result;
-        if (min1 <= max3) {
-            if (min2 <= max3) {
-                if (max3 - min1 > 12 && max3 - min2 > 12 && Math.abs((max3 - min2)) / (max3 - min1) < 3) {
-                    result = 0;
-                } else {
-                    result = 1;
-                }
-            } else {
-                result = 0;
-            }
-        } else {
-            if (min2 <= max3) {
-                result = 0;
-            } else {
-                result = 2;
-            }
-        }
-        return result;
-    }
-
 
     //获取孕检排卵检测每次的值
     private void getToiletDetectionResult() {
@@ -489,7 +414,7 @@ public class PooaiDetectionManager {
 
     private Observable<Boolean> isToiletConnect() {
         return Observable.create(emitter -> {
-            emitter.onNext(true);
+            emitter.onNext(PooaiBleManager.getInstance().isDeviceConnected());
             emitter.onComplete();
         });
     }
