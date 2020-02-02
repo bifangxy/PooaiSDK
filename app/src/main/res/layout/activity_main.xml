@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/bt_start_scan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始扫描!"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bt_disconnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="断开连接!"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_scan"
+        app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/bt_start_urine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始尿检!"
+        app:layout_constraintStart_toEndOf="@+id/bt_disconnect"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bt_start_pregnancy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始孕检!"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_urine"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bt_start_ovulation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始排卵!"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_pregnancy" />
+
+    <Button
+        android:id="@+id/bt_start_heart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始心电!"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_ovulation"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_ovulation" />
+
+    <Button
+        android:id="@+id/bt_stop_heart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止心电!"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_heart"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_ovulation" />
+
+    <Button
+        android:id="@+id/bt_open_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打开夜灯!"
+        app:layout_constraintStart_toEndOf="@+id/bt_stop_heart"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_ovulation" />
+
+    <Button
+        android:id="@+id/bt_close_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="关闭夜灯!"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_ovulation" />
+
+    <Button
+        android:id="@+id/bt_open_flip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打开自动翻盖!"
+        app:layout_constraintStart_toEndOf="@+id/bt_close_light"
+        app:layout_constraintTop_toTopOf="@+id/bt_close_light" />
+
+    <Button
+        android:id="@+id/bt_close_flip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="关闭自动翻盖!"
+        app:layout_constraintStart_toEndOf="@+id/bt_open_flip"
+        app:layout_constraintTop_toTopOf="@+id/bt_close_light" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_ble_device"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_close_light" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
