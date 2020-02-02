@@ -39,6 +39,8 @@ public class PooaiBleManager {
 
     private OnBleScanListener mOnBleScanListener;
 
+    private OnBleConnectListener mOnBleConnectListener;
+
     private boolean mScanning;
 
     private boolean mConnected;
@@ -127,7 +129,8 @@ public class PooaiBleManager {
         }
     }
 
-    public void connectDevice(BluetoothDevice bluetoothDevice) {
+    public void connectDevice(BluetoothDevice bluetoothDevice, OnBleConnectListener onBleConnectListener) {
+        mOnBleConnectListener = onBleConnectListener;
         if (bluetoothDevice == null) {
             return;
         }
@@ -155,7 +158,7 @@ public class PooaiBleManager {
                 public void onComplete() {
                     if (!isDeviceConnected()) {
                         disconnectedDevice();
-                        connectDevice(bluetoothDevice);
+                        connectDevice(bluetoothDevice,onBleConnectListener);
                     }
                 }
 
@@ -183,12 +186,18 @@ public class PooaiBleManager {
                 Log.d(TAG, "马桶已连接");
                 mConnected = true;
                 gatt.discoverServices();
+                if (mOnBleConnectListener != null) {
+                    mOnBleConnectListener.connect();
+                }
             } else if (newState == 0) {
                 PooaiToiletCommandManager.getInstance().stopHeartbeat();
                 mConnected = false;
                 Log.d(TAG, "马桶断开连接");
                 gatt.disconnect();
                 gatt.close();
+                if (mOnBleConnectListener != null) {
+                    mOnBleConnectListener.connect();
+                }
             }
 
         }
@@ -256,6 +265,12 @@ public class PooaiBleManager {
         void startScan();
 
         void stopScan();
+    }
+
+    public interface OnBleConnectListener {
+        void connect();
+
+        void disconnect();
     }
 
     public boolean isDeviceConnected() {

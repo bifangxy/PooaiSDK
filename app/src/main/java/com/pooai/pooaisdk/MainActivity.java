@@ -83,7 +83,17 @@ public class MainActivity extends AppCompatActivity {
     private void initListener() {
         mBleAdapter.setOnItemClickListener((adapter, view, position) -> {
             BluetoothDevice pooaiBleDevice = mBleAdapter.getData().get(position);
-            mPooaiBleManager.connectDevice(pooaiBleDevice);
+            mPooaiBleManager.connectDevice(pooaiBleDevice, new PooaiBleManager.OnBleConnectListener() {
+                @Override
+                public void connect() {
+
+                }
+
+                @Override
+                public void disconnect() {
+
+                }
+            });
         });
     }
 
