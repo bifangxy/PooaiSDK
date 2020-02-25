@@ -93,11 +93,188 @@
         app:layout_constraintStart_toEndOf="@+id/bt_open_flip"
         app:layout_constraintTop_toTopOf="@+id/bt_close_light" />
 
+
+    <Button
+        android:id="@+id/bt_start_hip_wash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始臀洗"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_close_light" />
+
+    <Button
+        android:id="@+id/bt_stop_hip_wash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止臀洗"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_hip_wash"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_hip_wash" />
+
+    <Button
+        android:id="@+id/bt_start_women_wash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始妇洗"
+        app:layout_constraintStart_toEndOf="@+id/bt_stop_hip_wash"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_hip_wash" />
+    <Button
+        android:id="@+id/bt_stop_women_wash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止妇洗"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_women_wash"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_hip_wash" />
+
+
+    <Button
+        android:id="@+id/bt_start_lax"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始通便"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_hip_wash" />
+
+    <Button
+        android:id="@+id/bt_stop_lax"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止通便"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_lax"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_lax" />
+
+    <Button
+        android:id="@+id/bt_start_massage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始按摩"
+        app:layout_constraintStart_toEndOf="@+id/bt_stop_lax"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_lax" />
+    <Button
+        android:id="@+id/bt_stop_massage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止按摩"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_massage"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_lax" />
+
+    <Button
+        android:id="@+id/bt_start_dry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始烘干"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_lax" />
+
+    <Button
+        android:id="@+id/bt_stop_dry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止通便"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_dry"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_dry" />
+
+    <Button
+        android:id="@+id/bt_start_atomize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始雾化"
+        app:layout_constraintStart_toEndOf="@+id/bt_stop_dry"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_dry" />
+    <Button
+        android:id="@+id/bt_stop_atomize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止雾化"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_atomize"
+        app:layout_constraintTop_toTopOf="@+id/bt_start_dry" />
+
+
+    <Button
+        android:id="@+id/bt_open_double"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开双盖"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_dry" />
+
+    <Button
+        android:id="@+id/bt_open_single"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开单盖"
+        app:layout_constraintStart_toEndOf="@+id/bt_open_double"
+        app:layout_constraintTop_toTopOf="@+id/bt_open_double" />
+
+    <Button
+        android:id="@+id/bt_close_all_flip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="关盖"
+        app:layout_constraintStart_toEndOf="@+id/bt_open_single"
+        app:layout_constraintTop_toTopOf="@+id/bt_open_double" />
+
+    <Button
+        android:id="@+id/bt_water_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="水温调节"
+        app:layout_constraintStart_toEndOf="@+id/bt_close_all_flip"
+        app:layout_constraintTop_toTopOf="@+id/bt_open_double" />
+
+
+    <Button
+        android:id="@+id/bt_water_pressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="水压调节"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_open_double" />
+
+    <Button
+        android:id="@+id/bt_nozzle_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="喷嘴位置"
+        app:layout_constraintStart_toEndOf="@+id/bt_water_pressure"
+        app:layout_constraintTop_toTopOf="@+id/bt_water_pressure" />
+
+    <Button
+        android:id="@+id/bt_dry_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="风温调节"
+        app:layout_constraintStart_toEndOf="@+id/bt_nozzle_position"
+        app:layout_constraintTop_toTopOf="@+id/bt_water_pressure" />
+
+    <Button
+        android:id="@+id/bt_cushion_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="坐垫温度"
+        app:layout_constraintStart_toEndOf="@+id/bt_dry_temp"
+        app:layout_constraintTop_toTopOf="@+id/bt_water_pressure" />
+
+
+    <Button
+        android:id="@+id/bt_get_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="获取状态"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_water_pressure" />
+    <TextView
+        android:id="@+id/tv_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/bt_get_state"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_ble_device"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_close_light" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_state" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

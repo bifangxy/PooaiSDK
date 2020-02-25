@@ -18,9 +18,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
@@ -60,31 +64,65 @@ public class PooaiDetectionManager {
     }
 
     //开始尿检
-    public void startUrineTest(@NonNull OnDetectionListener<PooaiUrineData> onDetectionListener) {
+    public void startUrineTest(@NonNull final OnDetectionListener<PooaiUrineData> onDetectionListener) {
         if (mUrineDispose != null && !mUrineDispose.isDisposed()) {
             return;
         }
         mUrineDispose = isToiletConnect()
-                .flatMap((Function<Boolean, ObservableSource<Long>>) aBoolean -> {
-                    if (aBoolean) {
-                        return Observable.timer(URINE_WAITING_TIME, TimeUnit.MILLISECONDS);
-                    } else {
-                        return observer -> observer.onError(new Exception("device not connected"));
+                .flatMap(new Function<Boolean, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Boolean aBoolean) throws Exception {
+                        if (aBoolean) {
+                            return Observable.timer(URINE_WAITING_TIME, TimeUnit.MILLISECONDS);
+                        } else {
+                            return new ObservableSource<Long>() {
+                                @Override
+                                public void subscribe(Observer<? super Long> observer) {
+                                    observer.onError(new Exception("device not connected"));
+                                }
+                            };
+                        }
                     }
                 })
-                .map(aLong -> {
-                    sendStartUrineCommand();
-                    onDetectionListener.start();
-                    return true;
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long aLong) throws Exception {
+                        PooaiDetectionManager.this.sendStartUrineCommand();
+                        onDetectionListener.start();
+                        return true;
+                    }
                 })
-                .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> getUrineFinishObservable())
-                .filter(aBoolean -> aBoolean)
-                .doOnComplete(() -> {
-                    PooaiUrineData pooaiUrineData = getUrineTestResult();
-                    onDetectionListener.complete(pooaiUrineData);
+                .flatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(Boolean aBoolean) throws Exception {
+                        return PooaiDetectionManager.this.getUrineFinishObservable();
+                    }
                 })
-                .doOnDispose(onDetectionListener::cancel)
-                .doOnError(throwable -> onDetectionListener.error(throwable))
+                .filter(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
+                })
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        PooaiUrineData pooaiUrineData = PooaiDetectionManager.this.getUrineTestResult();
+                        onDetectionListener.complete(pooaiUrineData);
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        onDetectionListener.cancel();
+                    }
+                })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        onDetectionListener.error(throwable);
+                    }
+                })
                 .subscribe();
     }
 
@@ -100,9 +138,24 @@ public class PooaiDetectionManager {
 
     private Observable<Boolean> getUrineFinishObservable() {
         return Observable.timer(6000, TimeUnit.MILLISECONDS)
-                .flatMap((Function<Long, ObservableSource<Long>>) aLong -> Observable.interval(1000, TimeUnit.MILLISECONDS))
-                .map(aLong -> isUrineTestFinish())
-                .takeUntil((Predicate<Boolean>) aBoolean -> aBoolean);
+                .flatMap(new Function<Long, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Long aLong) throws Exception {
+                        return Observable.interval(1000, TimeUnit.MILLISECONDS);
+                    }
+                })
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long aLong) throws Exception {
+                        return PooaiDetectionManager.this.isUrineTestFinish();
+                    }
+                })
+                .takeUntil(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
+                });
     }
 
     private void sendStartUrineCommand() {
@@ -133,44 +186,87 @@ public class PooaiDetectionManager {
     }
 
     //开始孕检
-    public void startPregnancyTest(OnDetectionListener<PooaiPregnancyData> onDetectionListener) {
+    public void startPregnancyTest(final OnDetectionListener<PooaiPregnancyData> onDetectionListener) {
         if (mPregnancyDispose != null && !mPregnancyDispose.isDisposed()) {
             return;
         }
         mDataList.clear();
         mPregnancyDispose = isToiletConnect()
-                .flatMap((Function<Boolean, ObservableSource<Long>>) aBoolean -> {
-                    if (aBoolean) {
-                        return Observable.timer(URINE_WAITING_TIME, TimeUnit.MILLISECONDS);
-                    } else {
-                        return observer -> observer.onError(new Exception("device not connected"));
+                .flatMap(new Function<Boolean, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Boolean aBoolean) throws Exception {
+                        if (aBoolean) {
+                            return Observable.timer(URINE_WAITING_TIME, TimeUnit.MILLISECONDS);
+                        } else {
+                            return new ObservableSource<Long>() {
+                                @Override
+                                public void subscribe(Observer<? super Long> observer) {
+                                    observer.onError(new Exception("device not connected"));
+                                }
+                            };
+                        }
                     }
                 })
-                .map(aLong -> {
-                    sendStartPregnancyCommand();
-                    onDetectionListener.start();
-                    return true;
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long aLong) throws Exception {
+                        PooaiDetectionManager.this.sendStartPregnancyCommand();
+                        onDetectionListener.start();
+                        return true;
+                    }
                 })
-                .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> {
-                    return getPregnancyFirstStepObservable();
+                .flatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(Boolean aBoolean) throws Exception {
+                        return PooaiDetectionManager.this.getPregnancyFirstStepObservable();
+                    }
                 })
-                .filter(aBoolean -> aBoolean)
-                .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> {
-                    getToiletDetectionResult();
-                    sendSecondPregnancyCommand();
-                    return getPregnancySecondStepObservable();
+                .filter(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
                 })
-                .filter(aBoolean -> aBoolean)
-                .doOnNext(aBoolean -> {
-                    getToiletDetectionResult();
+                .flatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(Boolean aBoolean) throws Exception {
+                        PooaiDetectionManager.this.getToiletDetectionResult();
+                        PooaiDetectionManager.this.sendSecondPregnancyCommand();
+                        return PooaiDetectionManager.this.getPregnancySecondStepObservable();
+                    }
                 })
-                .doOnComplete(() -> {
-                    PooaiPregnancyData pooaiPregnancyData = new PooaiPregnancyData();
-                    pooaiPregnancyData.sourceData = mDataList.toString();
-                    onDetectionListener.complete(pooaiPregnancyData);
+                .filter(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
                 })
-                .doOnDispose(onDetectionListener::cancel)
-                .doOnError(onDetectionListener::error)
+                .doOnNext(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        PooaiDetectionManager.this.getToiletDetectionResult();
+                    }
+                })
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        PooaiPregnancyData pooaiPregnancyData = new PooaiPregnancyData();
+                        pooaiPregnancyData.sourceData = mDataList.toString();
+                        onDetectionListener.complete(pooaiPregnancyData);
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        onDetectionListener.cancel();
+                    }
+                })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        onDetectionListener.error(throwable);
+                    }
+                })
                 .subscribe();
     }
 
@@ -186,17 +282,47 @@ public class PooaiDetectionManager {
     //延时6s再去读取是否第一步完成
     private Observable<Boolean> getPregnancyFirstStepObservable() {
         return Observable.timer(6000, TimeUnit.MILLISECONDS)
-                .flatMap((Function<Long, ObservableSource<Long>>) aLong -> Observable.interval(1000, TimeUnit.MILLISECONDS))
-                .map(aLong -> isPregnancyFirstStepFinish())
-                .takeUntil((Predicate<Boolean>) aBoolean -> aBoolean);
+                .flatMap(new Function<Long, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Long aLong) throws Exception {
+                        return Observable.interval(1000, TimeUnit.MILLISECONDS);
+                    }
+                })
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long aLong) throws Exception {
+                        return PooaiDetectionManager.this.isPregnancyFirstStepFinish();
+                    }
+                })
+                .takeUntil(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
+                });
     }
 
     //延时1s再去读取是否第二步完成
     private Observable<Boolean> getPregnancySecondStepObservable() {
         return Observable.timer(1000, TimeUnit.MILLISECONDS)
-                .flatMap((Function<Long, ObservableSource<Long>>) aLong -> Observable.interval(1000, TimeUnit.MILLISECONDS))
-                .map(aLong -> isPregnancySecondStepFinish())
-                .takeUntil((Predicate<Boolean>) aBoolean -> aBoolean);
+                .flatMap(new Function<Long, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Long aLong) throws Exception {
+                        return Observable.interval(1000, TimeUnit.MILLISECONDS);
+                    }
+                })
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long aLong) throws Exception {
+                        return PooaiDetectionManager.this.isPregnancySecondStepFinish();
+                    }
+                })
+                .takeUntil(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
+                });
     }
 
     private void sendStartPregnancyCommand() {
@@ -219,41 +345,86 @@ public class PooaiDetectionManager {
     }
 
     //开始排卵检测
-    public void startOvulationTest(OnDetectionListener<PooaiOvulationData> onDetectionListener) {
+    public void startOvulationTest(final OnDetectionListener<PooaiOvulationData> onDetectionListener) {
         if (mOvulationDispose != null && !mOvulationDispose.isDisposed()) {
             return;
         }
         mOvulationDispose = isToiletConnect()
-                .flatMap((Function<Boolean, ObservableSource<Long>>) aBoolean -> {
-                    if (aBoolean) {
-                        return Observable.timer(URINE_WAITING_TIME, TimeUnit.MILLISECONDS);
-                    } else {
-                        return observer -> observer.onError(new Exception("device not connected"));
+                .flatMap(new Function<Boolean, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Boolean aBoolean) throws Exception {
+                        if (aBoolean) {
+                            return Observable.timer(URINE_WAITING_TIME, TimeUnit.MILLISECONDS);
+                        } else {
+                            return new ObservableSource<Long>() {
+                                @Override
+                                public void subscribe(Observer<? super Long> observer) {
+                                    observer.onError(new Exception("device not connected"));
+                                }
+                            };
+                        }
                     }
                 })
-                .map(aLong -> {
-                    onDetectionListener.start();
-                    sendStartOvulationCommand();
-                    return true;
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long aLong) throws Exception {
+                        onDetectionListener.start();
+                        PooaiDetectionManager.this.sendStartOvulationCommand();
+                        return true;
+                    }
                 })
-                .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> getOvulationFirstStepObservable())
-                .filter(aBoolean -> aBoolean)
-                .flatMap((Function<Boolean, ObservableSource<Boolean>>) aBoolean -> {
-                    getToiletDetectionResult();
-                    sendSecondOvulationCommand();
-                    return getOvulationSecondStepObservable();
+                .flatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(Boolean aBoolean) throws Exception {
+                        return PooaiDetectionManager.this.getOvulationFirstStepObservable();
+                    }
                 })
-                .filter(aBoolean -> aBoolean)
-                .doOnNext(aBoolean -> {
-                    getToiletDetectionResult();
+                .filter(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
                 })
-                .doOnComplete(() -> {
-                    PooaiOvulationData pooaiOvulationData = new PooaiOvulationData();
-                    pooaiOvulationData.sourceData = mDataList.toString();
-                    onDetectionListener.complete(pooaiOvulationData);
+                .flatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(Boolean aBoolean) throws Exception {
+                        PooaiDetectionManager.this.getToiletDetectionResult();
+                        PooaiDetectionManager.this.sendSecondOvulationCommand();
+                        return PooaiDetectionManager.this.getOvulationSecondStepObservable();
+                    }
                 })
-                .doOnDispose(onDetectionListener::cancel)
-                .doOnError(onDetectionListener::error)
+                .filter(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
+                })
+                .doOnNext(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        PooaiDetectionManager.this.getToiletDetectionResult();
+                    }
+                })
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        PooaiOvulationData pooaiOvulationData = new PooaiOvulationData();
+                        pooaiOvulationData.sourceData = mDataList.toString();
+                        onDetectionListener.complete(pooaiOvulationData);
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        onDetectionListener.cancel();
+                    }
+                })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        onDetectionListener.error(throwable);
+                    }
+                })
                 .subscribe();
     }
 
@@ -269,16 +440,46 @@ public class PooaiDetectionManager {
 
     private Observable<Boolean> getOvulationFirstStepObservable() {
         return Observable.timer(6000, TimeUnit.MILLISECONDS)
-                .flatMap((Function<Long, ObservableSource<Long>>) aLong -> Observable.interval(1000, TimeUnit.MILLISECONDS))
-                .map(aLong -> isOvulationFirstStepFinish())
-                .takeUntil((Predicate<Boolean>) aBoolean -> aBoolean);
+                .flatMap(new Function<Long, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Long aLong) throws Exception {
+                        return Observable.interval(1000, TimeUnit.MILLISECONDS);
+                    }
+                })
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long aLong) throws Exception {
+                        return PooaiDetectionManager.this.isOvulationFirstStepFinish();
+                    }
+                })
+                .takeUntil(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
+                });
     }
 
     private Observable<Boolean> getOvulationSecondStepObservable() {
         return Observable.timer(1000, TimeUnit.MILLISECONDS)
-                .flatMap((Function<Long, ObservableSource<Long>>) aLong -> Observable.interval(1000, TimeUnit.MILLISECONDS))
-                .map(aLong -> isOvulationSecondStepFinish())
-                .takeUntil((Predicate<Boolean>) aBoolean -> aBoolean);
+                .flatMap(new Function<Long, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Long aLong) throws Exception {
+                        return Observable.interval(1000, TimeUnit.MILLISECONDS);
+                    }
+                })
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long aLong) throws Exception {
+                        return PooaiDetectionManager.this.isOvulationSecondStepFinish();
+                    }
+                })
+                .takeUntil(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean aBoolean) throws Exception {
+                        return aBoolean;
+                    }
+                });
     }
 
     private void sendStartOvulationCommand() {
@@ -322,19 +523,36 @@ public class PooaiDetectionManager {
      *
      * @param onHeartDetectionListener
      */
-    public void startHeartTest(OnHeartDetectionListener onHeartDetectionListener) {
+    public void startHeartTest(final OnHeartDetectionListener onHeartDetectionListener) {
         if (mHeartDispose != null && !mHeartDispose.isDisposed()) {
             return;
         }
         PooaiToiletCommandManager.getInstance().changeToiletState(ToiletState.HEART);
         PooaiToiletCommandManager.getInstance().addToiletCommand(START_HEART_TEST);
         mHeartDispose = Observable
-                .create((ObservableOnSubscribe<byte[]>) emitter ->
-                        HeartParamsObservable.getInstance().setOnHeartReceiverListener(emitter::onNext))
-                .doOnNext(pooaiHeartData -> conversionHeartData(pooaiHeartData, onHeartDetectionListener))
-                .doOnDispose(() -> {
-                    PooaiToiletCommandManager.getInstance().addToiletCommand(STOP_HEAR_TEST);
-                    onHeartDetectionListener.complete();
+                .create(new ObservableOnSubscribe<byte[]>() {
+                    @Override
+                    public void subscribe(final ObservableEmitter<byte[]> emitter) throws Exception {
+                        HeartParamsObservable.getInstance().setOnHeartReceiverListener(new HeartParamsObservable.OnHeartReceiverListener() {
+                            @Override
+                            public void receive(byte[] value) {
+                                emitter.onNext(value);
+                            }
+                        });
+                    }
+                })
+                .doOnNext(new Consumer<byte[]>() {
+                    @Override
+                    public void accept(byte[] pooaiHeartData) throws Exception {
+                        PooaiDetectionManager.this.conversionHeartData(pooaiHeartData, onHeartDetectionListener);
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        PooaiToiletCommandManager.getInstance().addToiletCommand(STOP_HEAR_TEST);
+                        onHeartDetectionListener.complete();
+                    }
                 })
                 .subscribe();
     }
@@ -413,9 +631,12 @@ public class PooaiDetectionManager {
     }
 
     private Observable<Boolean> isToiletConnect() {
-        return Observable.create(emitter -> {
-            emitter.onNext(PooaiBleManager.getInstance().isDeviceConnected());
-            emitter.onComplete();
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                emitter.onNext(PooaiBleManager.getInstance().isDeviceConnected());
+                emitter.onComplete();
+            }
         });
     }
 
