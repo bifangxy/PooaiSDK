@@ -140,7 +140,7 @@ public class ToiletRegisterData {
     public ToiletCommand getRegister4LowCommand(int regAddr, int value) {
         int curValue = getRegisterValue(regAddr);
         curValue = (curValue & 0xff0f) | ((value << 4) & 0x00f0);
-        return new ToiletCommand(regAddr, value);
+        return new ToiletCommand(regAddr, curValue);
     }
 
     //获取修改后寄存器8-11位的值

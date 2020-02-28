@@ -5,7 +5,10 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -100,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
             mPooaiBleManager.connectDevice(pooaiBleDevice, new PooaiBleManager.OnBleConnectListener() {
                 @Override
                 public void connect() {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        mBtStartScan.setText("已连接");
+                        mRecyclerView.setVisibility(View.GONE);
+                    });
 
                 }
 
@@ -133,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 mBtStartScan.setText("开始扫描");
             }
         });
+        mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.bt_disconnect)
