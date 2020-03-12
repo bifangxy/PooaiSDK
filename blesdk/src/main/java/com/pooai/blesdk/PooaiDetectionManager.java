@@ -349,6 +349,7 @@ public class PooaiDetectionManager {
         if (mOvulationDispose != null && !mOvulationDispose.isDisposed()) {
             return;
         }
+        mDataList.clear();
         mOvulationDispose = isToiletConnect()
                 .flatMap(new Function<Boolean, ObservableSource<Long>>() {
                     @Override
@@ -517,6 +518,13 @@ public class PooaiDetectionManager {
         ToiletCommand toiletCommand = ToiletRegisterData.getInstance().getRegisterCommand(ToiletConfig.REGISTER_URINE_DOOR, 2);
         PooaiToiletCommandManager.getInstance().addToiletCommand(toiletCommand);
     }
+
+    //关闭孕检或排卵检测槽
+    public void closePregnancyAndOvulationTank() {
+        ToiletCommand toiletCommand = ToiletRegisterData.getInstance().getRegisterCommand(ToiletConfig.REGISTER_URINE_DOOR, 4);
+        PooaiToiletCommandManager.getInstance().addToiletCommand(toiletCommand);
+    }
+
 
     /**
      * 开始心电检测
