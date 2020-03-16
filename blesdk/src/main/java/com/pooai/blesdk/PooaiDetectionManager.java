@@ -1,7 +1,5 @@
 package com.pooai.blesdk;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.pooai.blesdk.data.PooaiOvulationData;
@@ -37,7 +35,7 @@ public class PooaiDetectionManager {
 
     private static final long URINE_WAITING_TIME = 20000;
 
-    private static final String START_HEART_TEST = "m00000-140-01\r\n";
+    private static final String START_HEART_TEST = "m00000-300-01\r\n";
     private static final String STOP_HEAR_TEST = "m00000-000-00\r\n";
 
     private Disposable mUrineDispose;
@@ -555,6 +553,7 @@ public class PooaiDetectionManager {
                         PooaiDetectionManager.this.conversionHeartData(pooaiHeartData, onHeartDetectionListener);
                     }
                 })
+                .timeout(5,TimeUnit.SECONDS)
                 .doOnDispose(new Action() {
                     @Override
                     public void run() throws Exception {
@@ -562,7 +561,17 @@ public class PooaiDetectionManager {
                         onHeartDetectionListener.complete();
                     }
                 })
-                .subscribe();
+                .subscribe(new Consumer<byte[]>() {
+                    @Override
+                    public void accept(byte[] bytes) throws Exception {
+
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                });
     }
 
     private void conversionHeartData(byte[] pooaiHeartData, OnHeartDetectionListener onHeartDetectionListener) {
