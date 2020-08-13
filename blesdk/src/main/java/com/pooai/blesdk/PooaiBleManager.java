@@ -129,7 +129,7 @@ public class PooaiBleManager {
         }
     }
 
-    public void connectDevice(BluetoothDevice bluetoothDevice, OnBleConnectListener onBleConnectListener) {
+    public void connectDevice(final BluetoothDevice bluetoothDevice,final OnBleConnectListener onBleConnectListener) {
         mOnBleConnectListener = onBleConnectListener;
         if (bluetoothDevice == null) {
             return;
@@ -196,7 +196,7 @@ public class PooaiBleManager {
                 gatt.disconnect();
                 gatt.close();
                 if (mOnBleConnectListener != null) {
-                    mOnBleConnectListener.connect();
+                    mOnBleConnectListener.disconnect();
                 }
             }
 

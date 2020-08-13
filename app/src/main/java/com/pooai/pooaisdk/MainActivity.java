@@ -5,8 +5,12 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.bt_start_scan)
     Button mBtStartScan;
 
+    @BindView(R.id.tv_state)
+    TextView mTvState;
+
     private BleAdapter mBleAdapter;
 
     private List<BluetoothDevice> mPooaiBleDeviceList;
@@ -53,6 +60,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean isPregnancy;
 
     private boolean isOvulation;
+
+    private int water_pressure_stall;
+
+    private int water_temp_stall;
+
+    private int dry_temp_stall;
+
+    private int nozzle_position_stall;
+
+    private int cushion_temp_stall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
             mPooaiBleManager.connectDevice(pooaiBleDevice, new PooaiBleManager.OnBleConnectListener() {
                 @Override
                 public void connect() {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        mBtStartScan.setText("已连接");
+                        mRecyclerView.setVisibility(View.GONE);
+                    });
 
                 }
 
@@ -119,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 mBtStartScan.setText("开始扫描");
             }
         });
+        mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.bt_disconnect)
@@ -270,5 +292,167 @@ public class MainActivity extends AppCompatActivity {
     public void closeFlip() {
         mPooaiControlManager.switchControlMode();
         mPooaiControlManager.closeAutoFlip();
+    }
+
+    @OnClick(R.id.bt_start_hip_wash)
+    public void startHipWash() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.startHipWash();
+        Log.d(TAG, "hip wash state = " + mPooaiControlManager.isHipWash());
+    }
+
+    @OnClick(R.id.bt_stop_hip_wash)
+    public void stopHipWash() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.stopHipWash();
+        Log.d(TAG, "hip wash state = " + mPooaiControlManager.isHipWash());
+    }
+
+    @OnClick(R.id.bt_start_women_wash)
+    public void startWomenWash() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.startWomanWash();
+        Log.d(TAG, "women wash state = " + mPooaiControlManager.isWomanWash());
+    }
+
+    @OnClick(R.id.bt_stop_women_wash)
+    public void stopWomenWash() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.stopHipWash();
+        Log.d(TAG, "women wash state = " + mPooaiControlManager.isWomanWash());
+    }
+
+    @OnClick(R.id.bt_start_lax)
+    public void startLax() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.startLaxative();
+        Log.d(TAG, "laxative state = " + mPooaiControlManager.isLaxative());
+    }
+
+    @OnClick(R.id.bt_stop_lax)
+    public void stopLax() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.stopLaxative();
+        Log.d(TAG, "laxative state = " + mPooaiControlManager.isLaxative());
+    }
+
+    @OnClick(R.id.bt_start_massage)
+    public void startMassage() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.startMassage();
+        Log.d(TAG, "massage state = " + mPooaiControlManager.isMassage());
+    }
+
+    @OnClick(R.id.bt_stop_massage)
+    public void stopMassage() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.stopMassage();
+        Log.d(TAG, "massage state = " + mPooaiControlManager.isMassage());
+    }
+
+    @OnClick(R.id.bt_start_dry)
+    public void startDry() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.startDrying();
+        Log.d(TAG, "dry state = " + mPooaiControlManager.isDrying());
+    }
+
+    @OnClick(R.id.bt_stop_dry)
+    public void stopDry() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.stopDrying();
+        Log.d(TAG, "dry state = " + mPooaiControlManager.isDrying());
+    }
+
+    @OnClick(R.id.bt_start_atomize)
+    public void startAtomize() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.startAtomize();
+        Log.d(TAG, "atomize state = " + mPooaiControlManager.isAtomize());
+    }
+
+    @OnClick(R.id.bt_stop_atomize)
+    public void stopAtomize() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.stopAtomize();
+        Log.d(TAG, "atomize state = " + mPooaiControlManager.isAtomize());
+    }
+
+    @OnClick(R.id.bt_open_double)
+    public void openDouble() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.openLid();
+    }
+
+    @OnClick(R.id.bt_open_single)
+    public void openSingle() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.openHalfLid();
+    }
+
+    @OnClick(R.id.bt_close_all_flip)
+    public void closeAllFlip() {
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.closeLid();
+    }
+
+
+    @OnClick(R.id.bt_water_temp)
+    public void waterTempStall() {
+        water_temp_stall = water_temp_stall % 6;
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.waterTemp(water_temp_stall);
+        water_temp_stall++;
+    }
+
+    @OnClick(R.id.bt_water_pressure)
+    public void waterPressureStall() {
+        water_pressure_stall = water_pressure_stall % 6;
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.waterPressure(water_pressure_stall);
+        water_pressure_stall++;
+    }
+
+    @OnClick(R.id.bt_dry_temp)
+    public void dryTempStall() {
+        dry_temp_stall = dry_temp_stall % 6;
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.windTemp(dry_temp_stall);
+        dry_temp_stall++;
+    }
+
+    @OnClick(R.id.bt_nozzle_position)
+    public void nozzlePositionStall() {
+        nozzle_position_stall = nozzle_position_stall % 6;
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.nozzlePosition(nozzle_position_stall);
+        nozzle_position_stall++;
+    }
+
+    @OnClick(R.id.bt_cushion_temp)
+    public void cushionTempStall() {
+        cushion_temp_stall = cushion_temp_stall % 6;
+        mPooaiControlManager.switchControlMode();
+        mPooaiControlManager.cushionTemp(cushion_temp_stall);
+        cushion_temp_stall++;
+    }
+
+    @OnClick(R.id.bt_get_state)
+    public void getState() {
+        mTvState.setText("臀洗 ：" + mPooaiControlManager.isHipWash()
+                + "   妇洗：" + mPooaiControlManager.isHipWash()
+                + "  通便：" + mPooaiControlManager.isLaxative()
+                + "  按摩：" + mPooaiControlManager.isMassage()
+                + "  烘干：" + mPooaiControlManager.isDrying()
+                + "  雾化：" + mPooaiControlManager.isAtomize() + "\n"
+                + "着坐：" + mPooaiControlManager.isSeat()
+                + "   水温异常：" + mPooaiControlManager.isWaterTempError()
+                + "   风温异常：" + mPooaiControlManager.isDryingTempError()
+                + "   坐垫温度异常：" + mPooaiControlManager.isCushionTempError() + "\n"
+                + "水温档位：" + mPooaiControlManager.getWaterTempStall()
+                + "   水压档位：" + mPooaiControlManager.getWaterPressureStall()
+                + "   风温档位：" + mPooaiControlManager.getWindTempStall()
+                + "   喷嘴位置：" + mPooaiControlManager.getNozzlePositionStall()
+                + "   坐垫温度：" + mPooaiControlManager.getCushionTempStall());
     }
 }
